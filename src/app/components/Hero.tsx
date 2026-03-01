@@ -150,7 +150,7 @@ export function Hero() {
             {/* Image */}
             <div className="relative rounded-3xl overflow-hidden border border-[#8B5CF6]/30 shadow-2xl">
               <img
-                src="https://scontent.fmnl16-1.fna.fbcdn.net/v/t39.30808-6/641494516_122180613320758737_4082049292236928284_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeFob2ZVT_Pnn5PxgVGj5XfAETjBoxTJEasROMGjFMkRqyg_GEYBpaKlIBccXGm6MYnV9fLc3bv61r7hhmmA0cTO&_nc_ohc=_MY-FrHIQVEQ7kNvwF7q1zt&_nc_oc=Adn6tMa4IvLiTPWJ1y1J7KXQMyfrkZQtVSTLjUwJLm3WpbB_Z9TwgAU3qRlF6xE5X8Y&_nc_zt=23&_nc_ht=scontent.fmnl16-1.fna&_nc_gid=AdYfiA7bfnIbGgIW08K5gw&oh=00_AfvuFDa6VHPx2zeELnlrBeAQzlPgRqH8uNNsTRW7dtMNbQ&oe=69A24269"
+                src="https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340978/1_e4yu5d.jpg"
                 alt="Featured Apparel"
                 className="w-full h-auto aspect-square object-cover"
               />

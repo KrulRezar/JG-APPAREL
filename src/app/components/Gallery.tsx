@@ -5,31 +5,31 @@ import { useState } from 'react';
 const galleryItems = [
   {
     id: 1,
-    image: 'https://scontent.fmnl16-1.fna.fbcdn.net/v/t39.30808-6/572268175_122161777592758737_5572591119586026330_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeEupjofbg5JnSlS591tTcurjGobOPiAlTmMahs4-ICVOR-wfUJ7WHPhzQm-lFPMKIRKqY3io_zt9lnG0bCM2u7M&_nc_ohc=axUIGLFPMvcQ7kNvwHEt3Hv&_nc_oc=Adl5w_mUSsmqMaSQ0dc0uf3ExWgJ0tE10x9NbOpZc99w8IUcLUz7fjHAODz6OEPcN9w&_nc_zt=23&_nc_ht=scontent.fmnl16-1.fna&_nc_gid=dPe4PAuqpuNIvFMj90zACw&oh=00_Afuts3ueoIZqQGKqAI1JTd8zG3jHj78EuYiAHcltVfcHZA&oe=69A252B4',
+    image: 'https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340978/1_e4yu5d.jpg',
     name: 'Custom Esports jerseys',
     price: 3999,
   },
   {
     id: 2,
-    image: 'https://scontent.fmnl16-1.fna.fbcdn.net/v/t39.30808-6/568628570_122160814262758737_8532058488864381824_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeG1fAXtJLSIkY4EG4jyjwVwylLW2zWEnwLKUtbbNYSfAvwVEZV724GUSa4AWiptrYwaVIAJMBtWOmeBv9xw03X6&_nc_ohc=HLauiW8rLw8Q7kNvwGdqOIP&_nc_oc=AdnsxmAHneDMVx56iYqJFNSpuJBvDUxGuipEupZ-E-RGE0kYfjDQdbapyu98G5XoE0M&_nc_zt=23&_nc_ht=scontent.fmnl16-1.fna&_nc_gid=Hv1icwFXzXHFYN-KZt3iDg&oh=00_AfvjCkisQkzDRwl1Wlg2-myM5a5PIT162QaJoqHuYvZ7rg&oe=69A24734',
+    image: 'https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.1_f1kyuo.jpg',
     name: '𝐏𝐡𝐢𝐥𝐢𝐩𝐩𝐢𝐧𝐞 𝐒𝐩𝐨𝐫𝐭𝐬 𝐂𝐨𝐦𝐦𝐢𝐬𝐬𝐢𝐨𝐧 𝐕𝐨𝐥𝐥𝐞𝐲𝐛𝐚𝐥𝐥 𝐉𝐞𝐫𝐬𝐞𝐲 ',
     price: 7499,
   },
   {
     id: 3,
-    image: 'https://scontent.fmnl16-1.fna.fbcdn.net/v/t39.30808-6/559381439_122159506304758737_4382151731362729854_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeGPOMkLC_3i0-SEy60hp3BCqtQxRlatTWSq1DFGVq1NZCHo_rUPUxFFXnahk4ociS8qZMJUeRklRcvYxbtBmpwX&_nc_ohc=HqjvntiidKMQ7kNvwGB42kx&_nc_oc=AdlCR35_CvQqLVjMQeLAJ4b_jmN_9Pnp913LT2q_5bvE3kYagSVIKLQ-8M2mm46NAV4&_nc_zt=23&_nc_ht=scontent.fmnl16-1.fna&_nc_gid=4XNX8RbfMnGkzATR1-SKsA&oh=00_AfuLTJyMxNpdv3zvlXZZGokOBmNQ4lEHAKLkJbFBgyXzaw&oe=69A23D61',
+    image: 'https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.2_xlzczk.jpg',
     name: 'Volleyball jersey & Shorts',
     price: 1899,
   },
   {
     id: 4,
-    image: 'https://scontent.fmnl16-1.fna.fbcdn.net/v/t39.30808-6/558297932_122158326626758737_7244078401004129426_n.jpg?_nc_cat=109&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeG4jBWEA9nqxLGFaZT-vlOVsUF10h2aN86xQXXSHZo3zrFbXbmJTO67hHJbCK8og89V1fcPgKKkM0VXLJ7roW3f&_nc_ohc=sHL0sp0fIo8Q7kNvwEl1YXj&_nc_oc=AdmcVNI_E_4H4wpvW4UEQORSTlUQLwZ4Va5RZBPRSUGsOqFX5nla7JTDB9TawOG4FSA&_nc_zt=23&_nc_ht=scontent.fmnl16-1.fna&_nc_gid=exiKAhKYeMFn8ZHMxGJwWQ&oh=00_AfsCn0rz1mt8iO-_pnhzqzbV_dNGGKif66BxJKf8oOLGHQ&oe=69A232C4',
+    image: 'https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340980/2.3_fuaet1.jpg',
     name: '𝐜𝐮𝐬𝐭𝐨𝐦 𝐛𝐚𝐬𝐤𝐞𝐭𝐛𝐚𝐥𝐥 𝐮𝐧𝐢𝐟𝐨𝐫𝐦𝐬',
     price: 12999,
   },
   {
     id: 5,
-    image: 'https://scontent.fmnl16-1.fna.fbcdn.net/v/t39.30808-6/641494516_122180613320758737_4082049292236928284_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=13d280&_nc_eui2=AeFob2ZVT_Pnn5PxgVGj5XfAETjBoxTJEasROMGjFMkRqyg_GEYBpaKlIBccXGm6MYnV9fLc3bv61r7hhmmA0cTO&_nc_ohc=_MY-FrHIQVEQ7kNvwF7q1zt&_nc_oc=Adn6tMa4IvLiTPWJ1y1J7KXQMyfrkZQtVSTLjUwJLm3WpbB_Z9TwgAU3qRlF6xE5X8Y&_nc_zt=23&_nc_ht=scontent.fmnl16-1.fna&_nc_gid=AdYfiA7bfnIbGgIW08K5gw&oh=00_AfvuFDa6VHPx2zeELnlrBeAQzlPgRqH8uNNsTRW7dtMNbQ&oe=69A24269',
+    image: 'https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340981/2.4_wbv5pk.jpg',
     name: 'Custom Jersey',
     price: 4599,
   },
