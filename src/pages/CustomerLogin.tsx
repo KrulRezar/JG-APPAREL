@@ -1,7 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, AlertCircle, ArrowRight, MailWarning } from 'lucide-react';
-import { signInWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth'; 
+import { Mail, Lock, AlertCircle, ArrowRight, Chrome } from 'lucide-react';
+import { 
+  signInWithEmailAndPassword, 
+  signOut, 
+  GoogleAuthProvider, 
+  signInWithPopup 
+} from 'firebase/auth'; 
 import { auth } from '../firebaseConfig';
 
 export function CustomerLogin() {
@@ -11,6 +16,22 @@ export function CustomerLogin() {
   const [isUnverified, setIsUnverified] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleGoogleLogin = async () => {
+    setError('');
+    setLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      // Google users are pre-verified
+      localStorage.setItem('customer_token', await result.user.getIdToken());
+      navigate('/shop');
+    } catch (err: any) {
+      setError('Google Sign-In failed. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,37 +43,25 @@ export function CustomerLogin() {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
 
-      // 1. Check if email is verified
       if (!user.emailVerified) {
         setIsUnverified(true);
         setError('Please verify your email address to continue.');
-        
-        // Sign out the user immediately so they aren't considered "logged in" in App state
         await signOut(auth);
         setLoading(false);
         return;
       }
 
-      // 2. If verified, set token and navigate
       localStorage.setItem('customer_token', await user.getIdToken());
       navigate('/shop');
     } catch (err: any) {
       if (err.code === 'auth/invalid-credential') {
         setError('Incorrect email or password.');
-      } else if (err.code === 'auth/too-many-requests') {
-        setError('Too many failed attempts. Try again later.');
       } else {
         setError('Authentication failed. Please check your connection.');
       }
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleResendLink = async () => {
-    // Note: Native Firebase requires the user to be signed in to resend.
-    // For a smoother UX, we suggest they check their spam or try registering again if they never got it.
-    alert("Check your inbox (and spam folder) for the original verification link.");
   };
 
   return (
@@ -75,6 +84,20 @@ export function CustomerLogin() {
             {error}
           </div>
         )}
+
+        <button
+          onClick={handleGoogleLogin}
+          disabled={loading}
+          className="w-full mb-6 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] group"
+        >
+          <Chrome className="w-5 h-5 text-violet-400 group-hover:scale-110 transition-transform" />
+          <span className="text-[10px] font-black uppercase tracking-widest">Continue with Google</span>
+        </button>
+
+        <div className="relative mb-8 text-center">
+          <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+          <span className="relative bg-[#0a0a0a] px-4 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">OR</span>
+        </div>
 
         <form onSubmit={handleLogin} className="space-y-5">
           <div className="space-y-2">
@@ -117,15 +140,6 @@ export function CustomerLogin() {
           </button>
         </form>
 
-        {isUnverified && (
-          <button 
-            onClick={handleResendLink}
-            className="mt-4 w-full text-[10px] text-orange-400 font-bold uppercase tracking-widest hover:underline transition-all"
-          >
-            Lost the link? Check your spam folder
-          </button>
-        )}
-
         <div className="mt-10 pt-8 border-t border-white/5 text-center">
           <button 
             onClick={() => navigate('/register')}
@@ -137,4 +151,4 @@ export function CustomerLogin() {
       </div>
     </div>
   );
-} 
+}

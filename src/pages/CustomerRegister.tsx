@@ -1,7 +1,14 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, AlertCircle, ArrowRight, CheckCircle2 } from 'lucide-react';
-import { createUserWithEmailAndPassword, updateProfile, sendEmailVerification, signOut } from 'firebase/auth';
+import { Mail, Lock, User, AlertCircle, ArrowRight, CheckCircle2, Chrome } from 'lucide-react';
+import { 
+  createUserWithEmailAndPassword, 
+  updateProfile, 
+  sendEmailVerification, 
+  signOut,
+  GoogleAuthProvider,
+  signInWithPopup
+} from 'firebase/auth';
 import { auth } from '../firebaseConfig';
 
 export function CustomerRegister() {
@@ -10,6 +17,21 @@ export function CustomerRegister() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+
+  const handleGoogleRegister = async () => {
+    setError('');
+    setLoading(true);
+    const provider = new GoogleAuthProvider();
+    try {
+      const result = await signInWithPopup(auth, provider);
+      localStorage.setItem('customer_token', await result.user.getIdToken());
+      navigate('/shop');
+    } catch (err: any) {
+      setError('Google Registration failed.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,18 +44,11 @@ export function CustomerRegister() {
     setLoading(true);
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
-      
-      // 1. Set the display name
       await updateProfile(userCredential.user, { displayName: formData.name });
-      
-      // 2. Send Verification Email
       await sendEmailVerification(userCredential.user);
-      
-      // 3. Force sign out so they must log in AFTER verifying
       await signOut(auth);
       
       setSuccess(true);
-      // Automatically redirect to login after 5 seconds
       setTimeout(() => navigate('/login'), 5000);
     } catch (err: any) {
       if (err.code === 'auth/email-already-in-use') {
@@ -68,10 +83,7 @@ export function CustomerRegister() {
               A verification link has been sent to <span className="text-white">{formData.email}</span>. 
               Please verify before logging in.
             </p>
-            <button 
-              onClick={() => navigate('/login')}
-              className="text-violet-400 text-[10px] font-black uppercase tracking-widest hover:text-violet-300 transition-colors"
-            >
+            <button onClick={() => navigate('/login')} className="text-violet-400 text-[10px] font-black uppercase tracking-widest hover:text-violet-300">
               Go to Login
             </button>
           </div>
@@ -79,10 +91,23 @@ export function CustomerRegister() {
           <>
             {error && (
               <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-[10px] font-black uppercase tracking-widest">
-                <AlertCircle size={14} />
-                {error}
+                <AlertCircle size={14} /> {error}
               </div>
             )}
+
+            <button
+              onClick={handleGoogleRegister}
+              disabled={loading}
+              className="w-full mb-6 bg-white/5 hover:bg-white/10 border border-white/10 text-white py-4 rounded-2xl flex items-center justify-center gap-3 transition-all active:scale-[0.98] group"
+            >
+              <Chrome className="w-5 h-5 text-violet-400 group-hover:scale-110 transition-transform" />
+              <span className="text-[10px] font-black uppercase tracking-widest">Register with Google</span>
+            </button>
+
+            <div className="relative mb-8 text-center">
+              <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+              <span className="relative bg-[#0a0a0a] px-4 text-[10px] font-black text-white/20 uppercase tracking-[0.3em]">OR</span>
+            </div>
 
             <form onSubmit={handleRegister} className="space-y-4">
               <div className="space-y-1">
@@ -92,7 +117,7 @@ export function CustomerRegister() {
                   <input
                     type="text"
                     required
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/5 focus:outline-none focus:border-violet-500/50 transition-all text-sm"
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 text-white text-sm focus:border-violet-500/50 outline-none"
                     placeholder="Juana Dela Cruz"
                     onChange={(e) => setFormData({...formData, name: e.target.value})}
                   />
@@ -106,7 +131,7 @@ export function CustomerRegister() {
                   <input
                     type="email"
                     required
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-white placeholder:text-white/5 focus:outline-none focus:border-violet-500/50 transition-all text-sm"
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 text-white text-sm focus:border-violet-500/50 outline-none"
                     placeholder="customer@email.com"
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
                   />
@@ -120,7 +145,7 @@ export function CustomerRegister() {
                   <input
                     type="password"
                     required
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-violet-500/50 transition-all text-sm"
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 text-white text-sm focus:border-violet-500/50 outline-none"
                     placeholder="••••••••"
                     onChange={(e) => setFormData({...formData, password: e.target.value})}
                   />
@@ -134,7 +159,7 @@ export function CustomerRegister() {
                   <input
                     type="password"
                     required
-                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 pr-4 text-white focus:outline-none focus:border-violet-500/50 transition-all text-sm"
+                    className="w-full bg-black/40 border border-white/5 rounded-2xl py-3.5 pl-12 text-white text-sm focus:border-violet-500/50 outline-none"
                     placeholder="••••••••"
                     onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
                   />
@@ -144,7 +169,7 @@ export function CustomerRegister() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full bg-violet-600 hover:bg-violet-700 disabled:opacity-50 text-white font-black py-4 rounded-2xl mt-4 transition-all active:scale-[0.98] uppercase tracking-[0.2em] flex items-center justify-center gap-2 group"
+                className="w-full bg-violet-600 hover:bg-violet-700 text-white font-black py-4 rounded-2xl mt-4 uppercase tracking-[0.2em] flex items-center justify-center gap-2 group transition-all"
               >
                 {loading ? 'Creating...' : 'Register Now'}
                 {!loading && <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />}
@@ -154,10 +179,7 @@ export function CustomerRegister() {
         )}
 
         <div className="mt-8 pt-6 border-t border-white/5 text-center">
-          <button 
-            onClick={() => navigate('/login')}
-            className="text-white/30 text-[10px] font-black uppercase tracking-widest hover:text-violet-400 transition-colors"
-          >
+          <button onClick={() => navigate('/login')} className="text-white/30 text-[10px] font-black uppercase tracking-widest hover:text-violet-400">
             Already a member? <span className="text-white">Sign In</span>
           </button>
         </div>

@@ -6,9 +6,9 @@ import { Helmet } from 'react-helmet-async';
 
 // Inside your Product/Store component
 <Helmet>
-  <title>Premium Sports Jerseys | JG Apparel</title>
+  <title>Premium Sports Jerseys | Jersey Gear </title>
   <meta name="description" content="Shop the latest high-performance sports apparel. Prices starting at ₱1,500." />
-  <meta property="og:title" content="JG Apparel - Elite Performance" />
+  <meta property="og:title" content="Jersey Gear - Elite Performance" />
   <meta property="og:image" content="https://jg-apparel.vercel.app/og-image.jpg" />
 </Helmet>
 
@@ -16,7 +16,12 @@ const PRODUCTS = [
   { id: '1', name: "Basket-Ball Jersey", price: 2450, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340978/1_e4yu5d.jpg" },
   { id: '2', name: "Non-Player Jersey", price: 1850, category: "Non-Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.1_f1kyuo.jpg" },
   { id: '3', name: "Badminton Jersey", price: 3200, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.2_xlzczk.jpg" },
-  { id: '4', name: "Woman's Volleyball Jersey", price: 2100, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340980/2.3_fuaet1.jpg" }
+  { id: '4', name: "Woman's Volleyball Jersey", price: 2100, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340980/2.3_fuaet1.jpg" },
+  { id: '5', name: "Basket-Ball Jersey", price: 2450, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340978/1_e4yu5d.jpg" },
+  { id: '6', name: "Non-Player Jersey", price: 1850, category: "Non-Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.1_f1kyuo.jpg" },
+  { id: '7', name: "Badminton Jersey", price: 3200, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.2_xlzczk.jpg" },
+  { id: '8', name: "Woman's Volleyball Jersey", price: 2100, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340980/2.3_fuaet1.jpg" },
+
 ];
 
 export const Store = () => {
