@@ -59,7 +59,7 @@ export function Navbar() {
                 <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#8B5CF6] to-[#6D28D9] flex items-center justify-center group-hover:scale-110 transition-transform">
                   <Home className="w-5 h-5 text-white" />
                 </div>
-                <span className="text-lg md:text-xl font-bold tracking-tight text-white uppercase italic">JG Apparel</span>
+                <span className="text-lg md:text-xl font-bold tracking-tight text-white uppercase italic">Jersey Gear</span>
               </Link>
 
               {/* Desktop Nav Links */}

@@ -2,12 +2,21 @@ import React from 'react';
 import { useCart } from '../context/CartContext';
 import { Plus, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
+import { Helmet } from 'react-helmet-async';
+
+// Inside your Product/Store component
+<Helmet>
+  <title>Premium Sports Jerseys | JG Apparel</title>
+  <meta name="description" content="Shop the latest high-performance sports apparel. Prices starting at ₱1,500." />
+  <meta property="og:title" content="JG Apparel - Elite Performance" />
+  <meta property="og:image" content="https://jg-apparel.vercel.app/og-image.jpg" />
+</Helmet>
 
 const PRODUCTS = [
-  { id: '1', name: "Aero-Tech Performance Jersey", price: 2450, category: "Pro Series", image: "https://images.unsplash.com/photo-1581655353564-df123a1eb820?q=80&w=600" },
-  { id: '2', name: "Vanguard Compression Shorts", price: 1850, category: "Training", image: "https://images.unsplash.com/photo-1539185441755-769473a23570?q=80&w=600" },
-  { id: '3', name: "Stealth Windbreaker", price: 3200, category: "Outerwear", image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?q=80&w=600" },
-  { id: '4', name: "Apex Training Joggers", price: 2100, category: "Essentials", image: "https://images.unsplash.com/photo-1552664110-ad30427b2438?q=80&w=600" }
+  { id: '1', name: "Basket-Ball Jersey", price: 2450, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340978/1_e4yu5d.jpg" },
+  { id: '2', name: "Non-Player Jersey", price: 1850, category: "Non-Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.1_f1kyuo.jpg" },
+  { id: '3', name: "Badminton Jersey", price: 3200, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340979/2.2_xlzczk.jpg" },
+  { id: '4', name: "Woman's Volleyball Jersey", price: 2100, category: "Player Jersey", image: "https://res.cloudinary.com/dczcyu7e7/image/upload/v1772340980/2.3_fuaet1.jpg" }
 ];
 
 export const Store = () => {
@@ -22,10 +31,10 @@ export const Store = () => {
     <div className="min-h-screen bg-[#0a0a0a] pt-32 pb-20 px-6 md:px-12">
       <div className="max-w-7xl mx-auto mb-16">
         <h1 className="text-5xl font-black text-white tracking-tighter italic uppercase">
-          JG <span className="text-violet-500">Store</span>
+          Jersey Gear <span className="text-violet-500">Store</span>
         </h1>
         <p className="text-white/60 mt-4 max-w-xl border-l-2 border-violet-500/50 pl-4">
-          High-performance gear for the modern athlete. Prices in ₱.
+          Discover our premium collection of sports apparel, designed for performance and style.
         </p>
       </div>
 

@@ -1,24 +1,39 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Mail, Lock, AlertCircle, ArrowRight } from 'lucide-react';
-import { signInWithEmailAndPassword } from 'firebase/auth'; 
+import { Mail, Lock, AlertCircle, ArrowRight, MailWarning } from 'lucide-react';
+import { signInWithEmailAndPassword, sendEmailVerification, signOut } from 'firebase/auth'; 
 import { auth } from '../firebaseConfig';
 
 export function CustomerLogin() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [isUnverified, setIsUnverified] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
+    setIsUnverified(false);
     setLoading(true);
 
     try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
+
+      // 1. Check if email is verified
+      if (!user.emailVerified) {
+        setIsUnverified(true);
+        setError('Please verify your email address to continue.');
+        
+        // Sign out the user immediately so they aren't considered "logged in" in App state
+        await signOut(auth);
+        setLoading(false);
+        return;
+      }
+
+      // 2. If verified, set token and navigate
       localStorage.setItem('customer_token', await user.getIdToken());
       navigate('/shop');
     } catch (err: any) {
@@ -32,6 +47,12 @@ export function CustomerLogin() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleResendLink = async () => {
+    // Note: Native Firebase requires the user to be signed in to resend.
+    // For a smoother UX, we suggest they check their spam or try registering again if they never got it.
+    alert("Check your inbox (and spam folder) for the original verification link.");
   };
 
   return (
@@ -49,7 +70,7 @@ export function CustomerLogin() {
         </header>
 
         {error && (
-          <div className="mb-6 p-4 bg-red-500/10 border border-red-500/20 rounded-2xl flex items-center gap-3 text-red-400 text-[10px] font-black uppercase tracking-widest animate-pulse">
+          <div className={`mb-6 p-4 rounded-2xl flex items-center gap-3 text-[10px] font-black uppercase tracking-widest ${isUnverified ? 'bg-orange-500/10 border border-orange-500/20 text-orange-400' : 'bg-red-500/10 border border-red-500/20 text-red-400'}`}>
             <AlertCircle size={14} />
             {error}
           </div>
@@ -96,6 +117,15 @@ export function CustomerLogin() {
           </button>
         </form>
 
+        {isUnverified && (
+          <button 
+            onClick={handleResendLink}
+            className="mt-4 w-full text-[10px] text-orange-400 font-bold uppercase tracking-widest hover:underline transition-all"
+          >
+            Lost the link? Check your spam folder
+          </button>
+        )}
+
         <div className="mt-10 pt-8 border-t border-white/5 text-center">
           <button 
             onClick={() => navigate('/register')}
@@ -107,4 +137,4 @@ export function CustomerLogin() {
       </div>
     </div>
   );
-}
+} 
