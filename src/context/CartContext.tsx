@@ -1,30 +1,34 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
+import { loadStripe } from '@stripe/stripe-js';
 
-// 1. Unified Interface Definitions
+// Initialize Stripe (Replace with your actual Publishable Key)
+const stripePromise = loadStripe('pk_test_your_key_here');
+
 interface CartItem {
   id: string;
   name: string;
   price: number;
   quantity: number;
+  image: string;
 }
 
 interface CartContextType {
   cart: CartItem[];
   addToCart: (item: CartItem) => void;
-  removeFromCart: (id: string) => void; // Added for better UX
+  removeFromCart: (id: string) => void;
+  clearCart: () => void; // Added to fix Checkout error
   totalPrice: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
+  processStripeCheckout: () => Promise<void>; // Added Stripe Helper
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-// 2. Single CartProvider Declaration
 export const CartProvider = ({ children }: { children: ReactNode }) => {
   const [cart, setCart] = useState<CartItem[]>([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // Function to add or increment items
   const addToCart = (newItem: CartItem) => {
     setCart((prev) => {
       const existingItem = prev.find((item) => item.id === newItem.id);
@@ -37,10 +41,9 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
       }
       return [...prev, { ...newItem, quantity: 1 }];
     });
-    setIsCartOpen(true);
+    
   };
 
-  // Function to remove or decrement items
   const removeFromCart = (id: string) => {
     setCart((prev) => {
       const existingItem = prev.find(item => item.id === id);
@@ -53,18 +56,50 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
     });
   };
 
-  // Calculate total in Pesos (₱)
   const totalPrice = cart.reduce((acc, item) => acc + item.price * (item.quantity || 1), 0);
+
+  // Essential for after-purchase cleanup
+  const clearCart = () => {
+    setCart([]);
+    localStorage.removeItem('cart'); // If you use persistence
+  };
+
+  // --- STRIPE CHECKOUT LOGIC ---
+  const processStripeCheckout = async () => {
+    try {
+      const stripe = await stripePromise;
+      if (!stripe) throw new Error("Stripe failed to initialize.");
+
+      // In production, you fetch the Session ID from your backend/Firebase Function
+      // const response = await fetch('/api/create-checkout-session', { method: 'POST', body: JSON.stringify({ items: cart }) });
+      // const session = await response.json();
+
+      // Redirect to Stripe Hosted Checkout
+      // const result = await stripe.redirectToCheckout({ sessionId: session.id });
+
+      // if (result.error) {
+      //   console.error(result.error.message);
+      //   throw new Error(result.error.message);
+      // }
+
+      console.log("Stripe Session Created for total:", totalPrice);
+    } catch (error: any) {
+      console.error("Stripe Checkout Error:", error.message);
+      throw error; // Re-throw so the UI can catch it
+    }
+  };
 
   return (
     <CartContext.Provider 
       value={{ 
         cart, 
         addToCart, 
-        removeFromCart, // Exposed to the app
+        removeFromCart, 
+        clearCart,
         totalPrice, 
         isCartOpen, 
-        setIsCartOpen 
+        setIsCartOpen,
+        processStripeCheckout
       }}
     >
       {children}
@@ -72,7 +107,6 @@ export const CartProvider = ({ children }: { children: ReactNode }) => {
   );
 };
 
-// 3. Custom Hook
 export const useCart = () => {
   const context = useContext(CartContext);
   if (!context) throw new Error("useCart must be used within a CartProvider");

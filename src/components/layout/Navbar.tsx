@@ -1,18 +1,23 @@
-import { ShoppingBag, LogIn, Menu, X, Home, User, LayoutDashboard } from 'lucide-react';
+import { ShoppingBag, LogIn, Menu, X, Home, User, LayoutDashboard, LogOut } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { auth } from '../../firebaseConfig';
 
-export function Navbar() {
+// Define the Props interface to fix the TypeScript error
+interface NavbarProps {
+  user: any;
+}
+
+export function Navbar({ user }: NavbarProps) {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { setIsCartOpen, cart } = useCart();
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Unified check for customer login status
-  const isCustomerLoggedIn = !!localStorage.getItem('customer_token');
+  // Use the prop instead of localStorage for real-time UI updates
+  const isCustomerLoggedIn = !!user;
 
   const handleNavigation = (id: string) => {
     if (location.pathname !== '/') {
@@ -32,7 +37,6 @@ export function Navbar() {
 
   const handleLogout = async () => {
     try {
-      // Clear Firebase session and local storage
       await auth.signOut();
       localStorage.removeItem('customer_token');
       navigate('/login');
@@ -71,11 +75,9 @@ export function Navbar() {
 
               {/* Right Side Icons */}
               <div className="flex items-center gap-3">
-                {/* Customer Profile/Login Icon (Desktop) */}
                 <Link 
                   to={isCustomerLoggedIn ? "/dashboard" : "/login"} 
                   className="hidden lg:flex items-center justify-center w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all text-white/70 hover:text-white group"
-                  title={isCustomerLoggedIn ? "Dashboard" : "Login"}
                 >
                   {isCustomerLoggedIn ? (
                     <LayoutDashboard className="w-5 h-5 group-hover:text-violet-400 transition-colors" />
@@ -84,7 +86,6 @@ export function Navbar() {
                   )}
                 </Link>
 
-                {/* Cart Toggle */}
                 <button 
                   onClick={() => setIsCartOpen(true)}
                   className="relative w-10 h-10 flex items-center justify-center rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 transition-all"
@@ -97,7 +98,6 @@ export function Navbar() {
                   )}
                 </button>
 
-                {/* Mobile Menu Toggle */}
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="lg:hidden w-10 h-10 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center justify-center transition-colors"
@@ -123,14 +123,13 @@ export function Navbar() {
               <button onClick={() => handleNavigation('about')} className="text-left text-white/70 py-2 uppercase text-xs font-black tracking-[0.2em]">About</button>
               <Link to="/shop" onClick={() => setIsMobileMenuOpen(false)} className="text-white/70 py-2 uppercase text-xs font-black tracking-[0.2em]">Store</Link>
               
-              {/* Customer Dashboard / Login logic in Mobile Menu */}
               {isCustomerLoggedIn ? (
                 <>
                   <Link to="/dashboard" onClick={() => setIsMobileMenuOpen(false)} className="text-left text-white/70 py-2 uppercase text-xs font-black tracking-[0.2em] flex items-center gap-2">
                     <LayoutDashboard className="w-4 h-4 text-violet-400" /> Dashboard
                   </Link>
                   <button onClick={handleLogout} className="text-left text-red-400 py-2 uppercase text-xs font-black tracking-[0.2em] flex items-center gap-2">
-                    <LogIn className="w-4 h-4 rotate-180" /> Logout
+                    <LogOut className="w-4 h-4" /> Logout
                   </button>
                 </>
               ) : (
@@ -138,15 +137,6 @@ export function Navbar() {
                   <LogIn className="w-4 h-4" /> Customer Login
                 </Link>
               )}
-
-              <div className="pt-4 border-t border-white/10">
-                <button 
-                  onClick={() => { setIsMobileMenuOpen(false); setIsCartOpen(true); }}
-                  className="w-full px-6 py-4 rounded-xl bg-violet-600 text-white font-black uppercase text-xs tracking-widest shadow-lg shadow-violet-600/20"
-                >
-                  View Bag (₱)
-                </button>
-              </div>
             </div>
           </motion.div>
         )}

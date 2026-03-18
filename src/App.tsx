@@ -17,16 +17,21 @@ import { CustomerRegister } from './pages/CustomerRegister';
 import { Checkout } from './pages/Checkout';
 import { CustomerDashboard } from './pages/CustomerDashboard';
 
-interface LandingLayoutProps {
-  children: ReactNode;
-}
+/* --- UTILITY COMPONENTS --- */
+import { seedProducts } from './components/utils/seeder'; // adjust path
+
+const ScrollToTop = () => {
+  const { pathname } = useLocation();
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+  return null;
+};
 
 /* --- SECURITY HELPERS --- */
 
-// Admin check remains local-storage based for your secret portal
 const isAdminAuthenticated = () => !!localStorage.getItem('admin_token');
 
-// Lockout Logic: 5 tries, 2-hour cooldown
 const checkAdminLockout = () => {
   const attempts = Number(localStorage.getItem('admin_attempts') || 0);
   const lockUntil = Number(localStorage.getItem('admin_lockout_until') || 0);
@@ -36,35 +41,39 @@ const checkAdminLockout = () => {
     const remainingMinutes = Math.ceil((lockUntil - now) / 60000);
     return { isLocked: true, remainingMinutes };
   }
-  
-  if (attempts >= 5) {
-    localStorage.setItem('admin_attempts', '0');
-  }
-  
   return { isLocked: false, remainingMinutes: 0 };
+};
+
+// Fixed with React.ReactNode for broader compatibility
+const ProtectedRoute = ({ 
+  children, 
+  isAllowed, 
+  redirectTo = "/login" 
+}: { 
+  children: React.ReactNode, 
+  isAllowed: boolean, 
+  redirectTo?: string 
+}) => {
+  return isAllowed ? children : <Navigate to={redirectTo} replace />;
 };
 
 /* --- LAYOUT WRAPPERS --- */
 
-// Wrapper to hide Navbar/Cart on Admin pages
-const SiteLayout = ({ children }: { children: ReactNode }) => {
+const SiteLayout = ({ children, user }: { children: ReactNode, user: any }) => {
   const location = useLocation();
   const isAdminPath = location.pathname.startsWith('/system-portal');
 
   return (
     <div className="bg-[#0a0a0a] text-white min-h-screen font-sans selection:bg-violet-500/30">
-      {!isAdminPath && <Navbar />}
+      {!isAdminPath && <Navbar user={user} />}
       {!isAdminPath && <CartDrawer />}
       {children}
     </div>
   );
 };
 
-const LandingLayout = ({ children }: LandingLayoutProps) => (
-  <div 
-    className="h-screen overflow-y-scroll" 
-    style={{ scrollSnapType: 'y mandatory' }}
-  >
+const LandingLayout = ({ children }: { children: ReactNode }) => (
+  <div className="h-screen overflow-y-scroll snap-y snap-mandatory">
     {children}
   </div>
 );
@@ -75,14 +84,18 @@ export default function App() {
   const [isAuthLoading, setIsAuthLoading] = useState(true);
   const [customerUser, setCustomerUser] = useState<any>(null);
   const { isLocked, remainingMinutes } = checkAdminLockout();
-
-  // Listen for Firebase Auth changes to handle persistence
+  useEffect(() => {
+    // UNCOMMENT THE LINE BELOW TO RUN ONCE
+  seedProducts(); 
+  }, []);
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
-      setCustomerUser(user);
-      if (user) {
+      // Logic: Only consider "Authenticated" if verified OR Google user
+      if (user && (user.emailVerified || user.providerData[0]?.providerId === 'google.com')) {
+        setCustomerUser(user);
         user.getIdToken().then(token => localStorage.setItem('customer_token', token));
       } else {
+        setCustomerUser(null);
         localStorage.removeItem('customer_token');
       }
       setIsAuthLoading(false);
@@ -91,7 +104,6 @@ export default function App() {
     return () => unsubscribe();
   }, []);
 
-  // Prevent routing logic from running until we know the auth state
   if (isAuthLoading) {
     return (
       <div className="min-h-screen bg-[#0a0a0a] flex items-center justify-center">
@@ -100,62 +112,56 @@ export default function App() {
     );
   }
 
-  const isCustomerAuth = !!customerUser || !!localStorage.getItem('customer_token');
+  const isCustomerAuth = !!customerUser;
 
   return (
     <Router>
-      <SiteLayout>
+      <ScrollToTop />
+      <SiteLayout user={customerUser}>
         <Routes>
-          {/* Public Landing Page */}
-          <Route path="/" element={
-            <LandingLayout>
-              <LandingPage />
-            </LandingLayout>
-          } />
-
-          {/* Customer Public Routes */}
+          <Route path="/" element={<LandingLayout><LandingPage /></LandingLayout>} />
           <Route path="/shop" element={<Store />} />
           <Route path="/login" element={<CustomerLogin />} />
           <Route path="/register" element={<CustomerRegister />} />
           
-          {/* Customer Protected Routes */}
           <Route 
             path="/dashboard"  
-            element={isCustomerAuth ? <CustomerDashboard /> : <Navigate to="/login" replace />} 
+            element={
+              <ProtectedRoute isAllowed={isCustomerAuth}>
+                <CustomerDashboard />
+              </ProtectedRoute>
+            } 
           />
           
           <Route 
             path="/checkout" 
-            element={isCustomerAuth ? <Checkout /> : <Navigate to="/login" replace />} 
+            element={
+              <ProtectedRoute isAllowed={isCustomerAuth}>
+                <Checkout />
+              </ProtectedRoute>
+            } 
           />
           
-          {/* SECRET ADMIN GATEWAY */}
           <Route 
             path="/system-portal-gate" 
             element={
               isLocked ? (
-                <div className="flex items-center justify-center min-h-screen p-4">
-                  <div className="max-w-md w-full p-10 bg-white/5 border border-red-500/20 rounded-[2.5rem] text-center backdrop-blur-2xl">
-                    <h2 className="text-red-400 font-black text-2xl mb-2 uppercase tracking-tighter italic">System Locked</h2>
-                    <p className="text-white/60 text-sm leading-relaxed">
-                      Security protocol active. Too many failed attempts detected. <br />
-                      Access restored in <span className="text-white font-bold">{remainingMinutes} minutes</span>.
-                    </p>
-                  </div>
+                <div className="flex items-center justify-center min-h-screen p-4 text-center">
+                   <h2 className="text-red-400 font-bold uppercase italic">System Locked: {remainingMinutes}m</h2>
                 </div>
               ) : <AdminLogin />
             } 
           />
 
-          {/* SECRET ADMIN DASHBOARD */}
           <Route 
             path="/system-portal-dashboard" 
             element={
-              isAdminAuthenticated() ? <AdminDashboard /> : <Navigate to="/system-portal-gate" replace />
+              <ProtectedRoute isAllowed={isAdminAuthenticated()} redirectTo="/system-portal-gate">
+                <AdminDashboard />
+              </ProtectedRoute>
             } 
           />
 
-          {/* Global Fallback: Sends unknown paths to Home */}
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </SiteLayout>
